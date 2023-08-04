@@ -2,39 +2,71 @@ import 'package:flutter/material.dart';
 import 'package:scheduler/component/custom_textfield.dart';
 import 'package:scheduler/const/colors.dart';
 
-class ScheduleBottomSheet extends StatelessWidget {
+class ScheduleBottomSheet extends StatefulWidget {
   const ScheduleBottomSheet({super.key});
+
+  @override
+  State<ScheduleBottomSheet> createState() => _ScheduleBottomSheetState();
+}
+
+class _ScheduleBottomSheetState extends State<ScheduleBottomSheet> {
+  final GlobalKey<FormState> formKey = GlobalKey();
 
   @override
   Widget build(BuildContext context) {
     final bottomInset = MediaQuery.of(context).viewInsets.bottom;
 
-    return Container(
-      height: MediaQuery.of(context).size.height / 2 + bottomInset,
-      color: Colors.white,
-      child: Padding(
-        padding: EdgeInsets.only(bottom: bottomInset),
-        child: Padding(
-          padding: const EdgeInsets.only(
-            left: 8.0,
-            right: 8.0,
-            top: 16.0,
-          ),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              _Time(),
-              SizedBox(height: 16.0),
-              _Content(),
-              SizedBox(height: 16.0),
-              _ColorPicker(),
-              SizedBox(height: 16.0),
-              _SaveButton(),
-            ],
+    return GestureDetector(
+      onTap: () {
+        FocusScope.of(context).requestFocus(FocusNode());
+      },
+      child: SafeArea(
+        child: Container(
+          height: MediaQuery.of(context).size.height / 2 + bottomInset,
+          color: Colors.white,
+          child: Padding(
+            padding: EdgeInsets.only(bottom: bottomInset),
+            child: Padding(
+              padding: const EdgeInsets.only(
+                left: 8.0,
+                right: 8.0,
+                top: 16.0,
+              ),
+              child: Form(
+                key: formKey,
+                autovalidateMode: AutovalidateMode.always,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    _Time(),
+                    SizedBox(height: 16.0),
+                    _Content(),
+                    SizedBox(height: 16.0),
+                    _ColorPicker(),
+                    SizedBox(height: 16.0),
+                    _SaveButton(
+                      onPressed: onSavePressed,
+                    ),
+                  ],
+                ),
+              ),
+            ),
           ),
         ),
       ),
     );
+  }
+
+  void onSavePressed() {
+    if (formKey.currentState == null) {
+      return;
+    }
+
+    if (formKey.currentState!.validate()) {
+
+    } else {
+
+    }
   }
 }
 
@@ -47,6 +79,7 @@ class _Time extends StatelessWidget {
       children: [
         Expanded(
           child: CustomTextField(
+            isTime: true,
             label: '시작 시간',
           ),
         ),
@@ -55,6 +88,7 @@ class _Time extends StatelessWidget {
         ),
         Expanded(
           child: CustomTextField(
+            isTime: true,
             label: '마감 시간',
           ),
         ),
@@ -68,8 +102,11 @@ class _Content extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return CustomTextField(
-      label: '내용',
+    return Expanded(
+      child: CustomTextField(
+        isTime: false,
+        label: '내용',
+      ),
     );
   }
 }
@@ -107,7 +144,9 @@ class _ColorPicker extends StatelessWidget {
 }
 
 class _SaveButton extends StatelessWidget {
-  const _SaveButton({super.key});
+  final VoidCallback onPressed;
+
+  const _SaveButton({required this.onPressed, super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -115,7 +154,7 @@ class _SaveButton extends StatelessWidget {
       children: [
         Expanded(
           child: ElevatedButton(
-            onPressed: () {},
+            onPressed: onPressed,
             style: ElevatedButton.styleFrom(
               backgroundColor: PRIMARY_COLOR,
             ),

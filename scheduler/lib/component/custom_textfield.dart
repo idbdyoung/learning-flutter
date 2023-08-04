@@ -1,10 +1,16 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:scheduler/const/colors.dart';
 
 class CustomTextField extends StatelessWidget {
   final String label;
+  final bool isTime;
 
-  const CustomTextField({required this.label, super.key});
+  const CustomTextField({
+    required this.isTime,
+    required this.label,
+    super.key,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -18,15 +24,52 @@ class CustomTextField extends StatelessWidget {
             fontWeight: FontWeight.w600,
           ),
         ),
-        TextField(
-          cursorColor: Colors.grey,
-          decoration: InputDecoration(
-            border: InputBorder.none,
-            filled: true,
-            fillColor: Colors.grey[300],
+        if (isTime) renderTextField(),
+        if (!isTime)
+          Expanded(
+            child: renderTextField(),
           ),
-        ),
       ],
+    );
+  }
+
+  Widget renderTextField() {
+    return TextFormField(
+      validator: (String? val) {
+        if (val == null || val.isEmpty) {
+
+          return '값을 입력해주세요';
+        }
+
+        if (isTime) {
+          int time = int.parse(val);
+
+          if (time < 0) {
+            return '0 이상의 숫자를 입력해주세요';
+          }
+
+          if (time > 24) {
+            return '24 이하의 숫자를 입력해주세요';
+          }
+        } else {
+          if (val.length > 500) {
+            return '500자 이하의 글자를 입력해주세요.';
+          }
+        }
+
+        return null;
+      },
+      cursorColor: Colors.grey,
+      maxLines: isTime ? 1 : null,
+      expands: !isTime,
+      maxLength: 500,
+      keyboardType: isTime ? TextInputType.number : TextInputType.multiline,
+      inputFormatters: isTime ? [FilteringTextInputFormatter.digitsOnly] : [],
+      decoration: InputDecoration(
+        border: InputBorder.none,
+        filled: true,
+        fillColor: Colors.grey[300],
+      ),
     );
   }
 }
