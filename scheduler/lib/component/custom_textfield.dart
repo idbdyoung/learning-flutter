@@ -5,10 +5,14 @@ import 'package:scheduler/const/colors.dart';
 class CustomTextField extends StatelessWidget {
   final String label;
   final bool isTime;
+  final FormFieldSetter<String> onSaved;
+  final String initialValue;
 
   const CustomTextField({
     required this.isTime,
     required this.label,
+    required this.onSaved,
+    required this.initialValue,
     super.key,
   });
 
@@ -35,9 +39,9 @@ class CustomTextField extends StatelessWidget {
 
   Widget renderTextField() {
     return TextFormField(
+      onSaved: onSaved,
       validator: (String? val) {
         if (val == null || val.isEmpty) {
-
           return '값을 입력해주세요';
         }
 
@@ -69,7 +73,9 @@ class CustomTextField extends StatelessWidget {
         border: InputBorder.none,
         filled: true,
         fillColor: Colors.grey[300],
+        suffixText: isTime ? '시' : null,
       ),
+      initialValue: initialValue,
     );
   }
 }
